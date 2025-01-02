@@ -13,5 +13,6 @@ O ChatBot serve para conversão de moedas entre moedas específicas listadas no 
 - **Python** - Linguagem de programação principal.
 - **PyTelegramBotApi** - Biblioteca do Python que facilita na criação de chatbots para Telegram.
 - **Requests** - Biblioteca Python para requesição de dados na internet, usada para requesitar o cambio do dia na ExchangeRate API.
+- **OS e JSON** - Outras Bibliotecas Python para manipular arquivos JSON e para salvar as chaves das APIs em variáveis de ambiente.
 
 *Copyright &copy; 2025 - Manassés Ndombele - Programador Freelancer*

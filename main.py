@@ -1,9 +1,12 @@
 from telebot import TeleBot
 import requests
 import json
+import os
 
-koala_bot = TeleBot('7883845951:AAFVXWFoJME4FB0RwiM_K7i3Qxtd8bMky6s')
-api_url = 'https://v6.exchangerate-api.com/v6/82e46950c132c29d510a05c6/latest/{base_currency}'
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+EXCHANGE_RATE_TOKEN = os.getenv("EXCHANGE_RATE_TOKEN")
+koala_bot = TeleBot(TELEGRAM_TOKEN)
+api_url = 'https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}'
 accepted_currencies = ['USD', 'BRL', 'AOA', 'BTC', 'EUR', 'GBP']
 with open('./chats.json', 'r') as json_file:
     chats_datas = json.load(json_file)
@@ -37,7 +40,7 @@ def verify_convertion_value(msg):
 def convertion(msg):
     for chat in chats_datas['chats']:
         if chat.get('chat_id') == msg.chat.id:
-            response = requests.get(api_url.format(base_currency=chat.get('base_currency')))
+            response = requests.get(api_url.format(api_key=EXCHANGE_RATE_TOKEN, base_currency=chat.get('base_currency')))
             if response.status_code == 200:
                 response_data = response.json()
                 cambio = response_data['conversion_rates'][chat.get('convert_to')]
