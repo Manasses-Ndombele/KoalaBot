@@ -1,0 +1,10 @@
+{
+    "chats": [
+        {
+            "chat_id": 6782601911,
+            "base_currency": "AOA",
+            "convert_to": "USD",
+            "convert_value": "567"
+        }
+    ]
+}
