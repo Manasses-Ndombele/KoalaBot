@@ -121,21 +121,35 @@ def default_msg(msg):
 
 @koala_bot.message_handler(func=default_msg)
 def default_answer(msg):
-    answer = (
-        'Lamento mas não consegui perceber a sua mensagem, você pode estar vendo isso pelos seguintes motivos:\n'
-        'a) Você inseriu um valor inválido para ser convertido\n'
-        'b) Você escolheu uma moeda de base igual a moeda de destino na conversão\n'
-        '\nVocê pode tentar resolver:\n'
-        'a) Apagando o histórico de conversa para si e para o chatbot e reiniciar a conversa.\n'
-        'b) Ou clique aqui /start para reiniciar a conversa sem apagar o histórico.'
-    )
+    try:
+        print(f'Resposta recebida: {msg.text}')
+        answer = (
+            'Lamento mas não consegui perceber a sua mensagem, você pode estar vendo isso pelos seguintes motivos:\n'
+            'a) Você inseriu um valor inválido para ser convertido\n'
+            'b) Você escolheu uma moeda de base igual a moeda de destino na conversão\n'
+            '\nVocê pode tentar resolver:\n'
+            'a) Apagando o histórico de conversa para si e para o chatbot e reiniciar a conversa.\n'
+            'b) Ou clique aqui /start para reiniciar a conversa sem apagar o histórico.'
+        )
 
-    koala_bot.send_message(msg.chat.id, answer)
+        koala_bot.send_message(msg.chat.id, answer)
+        print('Mensagem enviada com sucesso!')
+
+    except Exception as e:
+        print(f'Erro na resposta: {e}')
 
 @app.route('/bot-webhook', methods=['POST'])
 def bot_webhook():
-    update = telebot.types.Update.de_json(request.get_json(force=True))
-    koala_bot.process_new_updates([update])
+    data = request.get_json(force=True)
+    print(f'Payload recebido: {json.dumps(data, indent=4)}')
+
+    try:
+        update = telebot.types.Update.de_json(request.get_json(force=True))
+        koala_bot.process_new_updates([update])
+
+    except Exception as e:
+        print(f'Erro no webhook: {e}')
+
     return "OK", 200
 
 @app.route('/')
