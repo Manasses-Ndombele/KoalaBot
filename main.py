@@ -1,5 +1,5 @@
-from telebot import TeleBot
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, request
+import telebot
 import requests
 import json
 import os
@@ -7,7 +7,9 @@ import os
 app = Flask(__name__)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 EXCHANGE_RATE_TOKEN = os.getenv("EXCHANGE_RATE_TOKEN")
-koala_bot = TeleBot(TELEGRAM_TOKEN)
+koala_bot = telebot.TeleBot(TELEGRAM_TOKEN)
+WEBHOOK_URL = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}/webhook"
+koala_bot.set_webhook(url=WEBHOOK_URL)
 api_url = 'https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}'
 accepted_currencies = ['USD', 'BRL', 'AOA', 'BTC', 'EUR', 'GBP']
 with open('./chats.json', 'r') as json_file:
@@ -112,14 +114,16 @@ def default_answer(msg):
 
     koala_bot.send_message(msg.chat.id, answer)
 
-@app.route('/bot')
-def bot():
-    koala_bot.polling()
-    return 'KOALA BOT EM FUNCIONAMENTO. ACESSE O TELEGRAM E PESQUISE POR koala_manasses_bot.'
+@app.route('/bot-webhook', methods=['POST'])
+def bot_webhook():
+    update = telebot.types.Update.de_json(request.get_json(force=True))
+    koala_bot.process_new_updates([update])
+    return "OK", 200
 
 @app.route('/')
 def home():
-    return redirect(url_for('bot'))
+    return redirect(url_for('bot_webhook'))
 
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
