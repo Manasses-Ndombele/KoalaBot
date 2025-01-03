@@ -2,6 +2,7 @@ from telebot import TeleBot
 import requests
 import json
 import os
+from keep_alive import keep_alive
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 EXCHANGE_RATE_TOKEN = os.getenv("EXCHANGE_RATE_TOKEN")
@@ -110,4 +111,6 @@ def default_answer(msg):
 
     koala_bot.send_message(msg.chat.id, answer)
 
-koala_bot.polling()
+if __name__ == '__main__':
+    koala_bot.polling()
+    keep_alive()
