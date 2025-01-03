@@ -5,10 +5,15 @@ import json
 import os
 
 app = Flask(__name__)
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-EXCHANGE_RATE_TOKEN = os.getenv("EXCHANGE_RATE_TOKEN")
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+EXCHANGE_RATE_TOKEN = os.getenv('EXCHANGE_RATE_TOKEN')
 koala_bot = telebot.TeleBot(TELEGRAM_TOKEN)
-WEBHOOK_URL = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}/bot-webhook"
+WEBHOOK_URL = f'https://koalabot.onrender.com/bot-webhook'
+response = requests.post(
+    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
+    data={"url": WEBHOOK_URL},
+)
+
 koala_bot.set_webhook(url=WEBHOOK_URL)
 api_url = 'https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}'
 accepted_currencies = ['USD', 'BRL', 'AOA', 'BTC', 'EUR', 'GBP']
