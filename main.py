@@ -33,6 +33,61 @@ def save_chats():
     with open('chats.json', 'w') as file:
         json.dump(chats_datas, file, indent=4)
 
+@koala_bot.message_handler(commands=['start'])
+def start_answer(msg):
+    print('Comando Start Recebido')
+    answer = (
+        f'Olá {msg.from_user.first_name}, este é um Bot que serve para a conversão de moedas.\n\n'
+        f'Clique na moeda que deseja converter. Temos disponíveis a conversão entre as seguintes moedas:\n\n'
+        '1- /USD - Dólar Americano\n'
+        '2- /BRL - Real Brasileiro\n'
+        '3- /AOA - Kwanzas Angolanos\n'
+        '4- /EUR - Euro da Europa\n'
+        '5- /BTC - Bitcoin do Satoshi Nakamoto\n'
+        '6- /GBP - Libra Esterlina do Reino Unido'
+    )
+
+    koala_bot.send_message(msg.chat.id, answer)
+    print('Resposta inicial enviada com sucesso!')
+
+def default_msg(msg):
+    return True
+
+@koala_bot.message_handler(func=default_msg)
+def default_answer(msg):
+    try:
+        print(f'Resposta recebida: {msg.text}')
+        answer = (
+            'Lamento mas não consegui perceber a sua mensagem, você pode estar vendo isso pelos seguintes motivos:\n'
+            'a) Você inseriu um valor inválido para ser convertido\n'
+            'b) Você escolheu uma moeda de base igual a moeda de destino na conversão\n'
+            '\nVocê pode tentar resolver:\n'
+            'a) Apagando o histórico de conversa para si e para o chatbot e reiniciar a conversa.\n'
+            'b) Ou clique aqui /start para reiniciar a conversa sem apagar o histórico.'
+        )
+
+        koala_bot.send_message(msg.chat.id, answer)
+        print('Mensagem enviada com sucesso!')
+
+    except Exception as e:
+        print(f'Erro na resposta: {e}')
+
+@koala_bot.message_handler(commands=accepted_currencies)
+def currency_choose(msg):
+    currency_key = msg.text.strip()[1:].strip()
+    datas_added = False
+    for chat in chats_datas['chats']:
+        if chat.get('chat_id') == msg.chat.id:
+            chat['base_currency'] = currency_key
+            datas_added = True
+
+    if not datas_added:
+        chats_datas['chats'].append({'chat_id': msg.chat.id, 'base_currency': currency_key})
+
+    save_chats()
+    answer = f'Ótimo agora digite o valor na moeda que deseja converter para {currency_key}\n\nEx: 10GBP, 15000USD, 45340.23BRL, etc.\n\nOBS: Não coloque a "," como separador decimal utilize o ".", não coloque um separador de milhar.'
+    koala_bot.reply_to(msg, answer)
+
 def verify_convertion_value(msg):
     try:
         convert_to = ''
@@ -84,61 +139,6 @@ def convertion(msg):
         else:
             answer = 'Lamento mas não entendi a sua mensagem. Reinicie a conversa ou limpe o histórico dessa conversa e siga as instruções para obter cotações.'
             koala_bot.reply_to(msg, answer)
-
-@koala_bot.message_handler(commands=accepted_currencies)
-def currency_choose(msg):
-    currency_key = msg.text.strip()[1:].strip()
-    datas_added = False
-    for chat in chats_datas['chats']:
-        if chat.get('chat_id') == msg.chat.id:
-            chat['base_currency'] = currency_key
-            datas_added = True
-
-    if not datas_added:
-        chats_datas['chats'].append({'chat_id': msg.chat.id, 'base_currency': currency_key})
-
-    save_chats()
-    answer = f'Ótimo agora digite o valor na moeda que deseja converter para {currency_key}\n\nEx: 10GBP, 15000USD, 45340.23BRL, etc.\n\nOBS: Não coloque a "," como separador decimal utilize o ".", não coloque um separador de milhar.'
-    koala_bot.reply_to(msg, answer)
-
-@koala_bot.message_handler(commands=['start'])
-def start_answer(msg):
-    print('Comando Start Recebido')
-    answer = (
-        f'Olá {msg.from_user.first_name}, este é um Bot que serve para a conversão de moedas.\n\n'
-        f'Clique na moeda que deseja converter. Temos disponíveis a conversão entre as seguintes moedas:\n\n'
-        '1- /USD - Dólar Americano\n'
-        '2- /BRL - Real Brasileiro\n'
-        '3- /AOA - Kwanzas Angolanos\n'
-        '4- /EUR - Euro da Europa\n'
-        '5- /BTC - Bitcoin do Satoshi Nakamoto\n'
-        '6- /GBP - Libra Esterlina do Reino Unido'
-    )
-
-    koala_bot.send_message(msg.chat.id, answer)
-    print('Resposta inicial enviada com sucesso!')
-
-def default_msg(msg):
-    return True
-
-@koala_bot.message_handler(func=default_msg)
-def default_answer(msg):
-    try:
-        print(f'Resposta recebida: {msg.text}')
-        answer = (
-            'Lamento mas não consegui perceber a sua mensagem, você pode estar vendo isso pelos seguintes motivos:\n'
-            'a) Você inseriu um valor inválido para ser convertido\n'
-            'b) Você escolheu uma moeda de base igual a moeda de destino na conversão\n'
-            '\nVocê pode tentar resolver:\n'
-            'a) Apagando o histórico de conversa para si e para o chatbot e reiniciar a conversa.\n'
-            'b) Ou clique aqui /start para reiniciar a conversa sem apagar o histórico.'
-        )
-
-        koala_bot.send_message(msg.chat.id, answer)
-        print('Mensagem enviada com sucesso!')
-
-    except Exception as e:
-        print(f'Erro na resposta: {e}')
 
 @app.route('/bot-webhook', methods=['POST'])
 def bot_webhook():
