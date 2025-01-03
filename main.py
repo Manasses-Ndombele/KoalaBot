@@ -152,7 +152,6 @@ def bot_webhook():
 
     try:
         update = Update.de_json(data, application.bot)
-        dispatcher.process_update(update)
         print('Mensagem enviada aos handlers')
     except Exception as e:
         print(f'Erro no webhook: {e}')
@@ -169,19 +168,19 @@ if __name__ == '__main__':
     updater = Updater(TELEGRAM_TOKEN, use_context=True)
 
     # Adiciona os handlers
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("USD", currency_choose))
-    dispatcher.add_handler(CommandHandler("BRL", currency_choose))
-    dispatcher.add_handler(CommandHandler("AOA", currency_choose))
-    dispatcher.add_handler(CommandHandler("EUR", currency_choose))
-    dispatcher.add_handler(CommandHandler("BTC", currency_choose))
-    dispatcher.add_handler(CommandHandler("GBP", currency_choose))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("USD", currency_choose))
+    application.add_handler(CommandHandler("BRL", currency_choose))
+    application.add_handler(CommandHandler("AOA", currency_choose))
+    application.add_handler(CommandHandler("EUR", currency_choose))
+    application.add_handler(CommandHandler("BTC", currency_choose))
+    application.add_handler(CommandHandler("GBP", currency_choose))
 
     # Handler para valores de conversão
-    dispatcher.add_handler(MessageHandler(filters.text & ~filters.command, convertion))
+    application.add_handler(MessageHandler(filters.text & ~filters.command, convertion))
 
     # Default handler
-    dispatcher.add_handler(MessageHandler(filters.text, default_answer))
+    application.add_handler(MessageHandler(filters.text, default_answer))
 
     # Inicializa o Flask e o webhook
     set_webhook()
