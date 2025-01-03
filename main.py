@@ -103,6 +103,7 @@ def currency_choose(msg):
 
 @koala_bot.message_handler(commands=['start'])
 def start_answer(msg):
+    print('Comando Start Recebido')
     answer = (
         f'Olá {msg.from_user.first_name}, este é um Bot que serve para a conversão de moedas.\n\n'
         f'Clique na moeda que deseja converter. Temos disponíveis a conversão entre as seguintes moedas:\n\n'
@@ -115,6 +116,7 @@ def start_answer(msg):
     )
 
     koala_bot.send_message(msg.chat.id, answer)
+    print('Resposta inicial enviada com sucesso!')
 
 def default_msg(msg):
     return True
@@ -145,7 +147,9 @@ def bot_webhook():
 
     try:
         update = telebot.types.Update.de_json(request.get_json(force=True))
+        print('Mensagens recebidas')
         koala_bot.process_new_updates([update])
+        print('Mensagens enviadas aos handlers')
 
     except Exception as e:
         print(f'Erro no webhook: {e}')
