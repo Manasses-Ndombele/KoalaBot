@@ -168,7 +168,6 @@ if __name__ == '__main__':
 
     # Configuração do Updater e Dispatcher
     updater = Updater(TELEGRAM_TOKEN, use_context=True)
-    dispatcher = updater.dispatcher
 
     # Adiciona os handlers
     dispatcher.add_handler(CommandHandler("start", start))
