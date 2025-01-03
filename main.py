@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, request
 import telebot
 import requests
 import json
@@ -9,10 +9,20 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 EXCHANGE_RATE_TOKEN = os.getenv('EXCHANGE_RATE_TOKEN')
 koala_bot = telebot.TeleBot(TELEGRAM_TOKEN)
 WEBHOOK_URL = f'https://koalabot.onrender.com/bot-webhook'
-response = requests.post(
-    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
-    data={"url": WEBHOOK_URL},
-)
+webhook_info = requests.get(
+    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getWebhookInfo"
+).json()
+
+if webhook_info.get("result", {}).get("url") != WEBHOOK_URL:
+    response = requests.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
+        data={"url": WEBHOOK_URL},
+    )
+
+    print(f'Webhook configurado: {response.json()}')
+
+else:
+    print("Webhook já está configurado.")
 
 koala_bot.set_webhook(url=WEBHOOK_URL)
 api_url = 'https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}'
@@ -127,7 +137,7 @@ def bot_webhook():
 
 @app.route('/')
 def home():
-    return redirect(url_for('bot_webhook'))
+    return "KoalaBot está rodando acesse o Telegram e converse com ele."
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
