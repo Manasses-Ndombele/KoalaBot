@@ -24,7 +24,6 @@ if webhook_info.get("result", {}).get("url") != WEBHOOK_URL:
 else:
     print("Webhook já está configurado.")
 
-koala_bot.set_webhook(url=WEBHOOK_URL)
 api_url = 'https://v6.exchangerate-api.com/v6/{api_key}/latest/{base_currency}'
 accepted_currencies = ['USD', 'BRL', 'AOA', 'BTC', 'EUR', 'GBP']
 with open('./chats.json', 'r') as json_file:
@@ -35,25 +34,29 @@ def save_chats():
         json.dump(chats_datas, file, indent=4)
 
 def verify_convertion_value(msg):
-    convert_to = ''
-    convert_value = ''
-    for char in msg.text:
-        if char.isnumeric() or char == '.':
-            convert_value += char
+    try:
+        convert_to = ''
+        convert_value = ''
+        for char in msg.text:
+            if char.isnumeric() or char == '.':
+                convert_value += char
 
-        elif char.isalpha():
-            convert_to += char
+            elif char.isalpha():
+                convert_to += char
 
-    if not convert_value.replace('.', '').isnumeric():
+        if not convert_value.replace('.', '').isnumeric():
+            return False
+
+        if convert_to.strip().upper() in accepted_currencies:
+            for chat in chats_datas['chats']:
+                if chat.get('chat_id') == msg.chat.id:
+                    chat['convert_to'] = convert_to
+                    chat['convert_value'] = convert_value
+                    save_chats()
+                    return True
+
+    except Exception as e:
         return False
-
-    if convert_to.strip().upper() in accepted_currencies:
-        for chat in chats_datas['chats']:
-            if chat.get('chat_id') == msg.chat.id:
-                chat['convert_to'] = convert_to
-                chat['convert_value'] = convert_value
-                save_chats()
-                return True  
 
 @koala_bot.message_handler(func=verify_convertion_value)
 def convertion(msg):
