@@ -3,13 +3,15 @@ import requests
 import json
 import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext, Application
 
 app = Flask(__name__)
 
 # Variáveis de ambiente
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 EXCHANGE_RATE_TOKEN = os.getenv('EXCHANGE_RATE_TOKEN')
+application = Application.builder().token(TELEGRAM_TOKEN).build()
+dispatcher = application.dispatcher
 
 # URLs
 WEBHOOK_URL = f'https://koalabot.onrender.com/bot-webhook'
@@ -150,7 +152,7 @@ def bot_webhook():
     print(f'Payload recebido: {json.dumps(data, indent=4)}')
 
     try:
-        update = Update.de_json(data, updater.bot)
+        update = Update.de_json(data, application.bot)
         dispatcher.process_update(update)
         print('Mensagem enviada aos handlers')
     except Exception as e:
@@ -187,4 +189,5 @@ if __name__ == '__main__':
     set_webhook()
 
     # Inicia o servidor Flask
-    app.run(host='0.0.0.0', port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
