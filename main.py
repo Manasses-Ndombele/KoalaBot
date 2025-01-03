@@ -3,7 +3,7 @@ import requests
 import json
 import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
 
 app = Flask(__name__)
 
@@ -178,10 +178,10 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler("GBP", currency_choose))
 
     # Handler para valores de conversão
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, convertion))
+    dispatcher.add_handler(MessageHandler(filters.text & ~filters.command, convertion))
 
     # Default handler
-    dispatcher.add_handler(MessageHandler(Filters.text, default_answer))
+    dispatcher.add_handler(MessageHandler(filters.text, default_answer))
 
     # Inicializa o Flask e o webhook
     set_webhook()
