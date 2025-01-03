@@ -11,7 +11,6 @@ app = Flask(__name__)
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 EXCHANGE_RATE_TOKEN = os.getenv('EXCHANGE_RATE_TOKEN')
 application = Application.builder().token(TELEGRAM_TOKEN).build()
-dispatcher = application.dispatcher
 
 # URLs
 WEBHOOK_URL = f'https://koalabot.onrender.com/bot-webhook'
