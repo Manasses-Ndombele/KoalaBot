@@ -1,9 +1,10 @@
 from telebot import TeleBot
+from flask import Flask, redirect, url_for
 import requests
 import json
 import os
-from keep_alive import keep_alive
 
+app = Flask(__name__)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 EXCHANGE_RATE_TOKEN = os.getenv("EXCHANGE_RATE_TOKEN")
 koala_bot = TeleBot(TELEGRAM_TOKEN)
@@ -111,6 +112,14 @@ def default_answer(msg):
 
     koala_bot.send_message(msg.chat.id, answer)
 
-if __name__ == '__main__':
+@app.route('/bot')
+def bot():
     koala_bot.polling()
-    keep_alive()
+    return 'KOALA BOT EM FUNCIONAMENTO. ACESSE O TELEGRAM E PESQUISE POR koala_manasses_bot.'
+
+@app.route('/')
+def home():
+    return redirect(url_for('bot'))
+
+if __name__ == '__main__':
+    app.run()
