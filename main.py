@@ -147,7 +147,8 @@ def bot_webhook():
 
     try:
         update = telebot.types.Update.de_json(request.get_json(force=True))
-        print(f"Atualização recebida: {update.to_dict()}")
+        print(f"Atualização recebida: {update}")
+        print(f"Atualização recebida: {vars(update)}")
         koala_bot.process_new_updates([update])
         print('Mensagens enviadas aos handlers')
 
